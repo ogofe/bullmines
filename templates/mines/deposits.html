@@ -1,0 +1,95 @@
+{% extends "mines/base.html" %}
+
+
+{% block content %}
+	<div class="container py-5">
+		<h2 class="text-muted mb-3"> Deposits </h2>
+		
+
+		<div class="row">
+	      <div class="col">
+	        <div class="card">
+	           <!-- Card header -->
+	            <div class="card-header border-0">
+	           		<h3 class="mb-0"> Deposit History </h3>
+	            </div>
+
+	            <!-- Light table -->
+	         	<div class="table-responsive">
+		            <table class="table align-items-center table-flush">
+		              <thead class="thead-light">
+		                <tr>
+		                  <th scope="col" class="sort" data-sort="name"> Package </th>
+		                  <th scope="col" class="sort" data-sort="budget"> Investment </th>
+		                  <th scope="col" class="sort" data-sort="status"> ROI </th>
+		                  <th scope="col" class="sort" data-sort="status"> Duration </th>
+		                </tr>
+		              </thead>
+
+		              <tbody class="list">
+
+		              	{% for pack in packages %}
+		              		
+		                <tr>
+		                	<td>
+			                	<span class="name mb-0 text-sm"> {{ deposit.id }} </span>
+	                		</td>
+
+		                    <td class="budget">
+		                    	<span> $ {{ deposit.amount }} USD </span>
+		                    </td>
+		                  
+		                    <td>
+			                    <span class="badge badge-dot mr-4">
+			                      <i class="bg-info"></i>
+			                      <span class="status"> {{ deposit.approved }} </span>
+			                    </span>
+		                    </td>
+		                  
+
+		                    <td>
+			                    <div class="d-flex align-items-center">
+			                      <span class="completion mr-2"> {{ transaction.date }} </span>
+			                    </div>
+		                    </td>
+		                </tr>
+		              	{% endfor %}
+
+		              </tbody>
+		            </table>
+		        </div>
+
+	            <!-- Card footer -->
+		        <div class="card-footer py-4">
+		            <nav aria-label="...">
+		              <ul class="pagination justify-content-end mb-0">
+		                <li class="page-item disabled">
+		                  <a class="page-link" href="#" tabindex="-1">
+		                    <i class="fas fa-angle-left"></i>
+		                    <span class="sr-only">Previous</span>
+		                  </a>
+		                </li>
+
+		                <li class="page-item active">
+		                  <a class="page-link" href="#">1</a>
+		                </li>
+
+		                <li class="page-item">
+		                  <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+		                </li>
+		           
+		                <li class="page-item">
+		                  <a class="page-link" href="#">
+		                    <i class="fas fa-angle-right"></i>
+		                    <span class="sr-only">Next</span>
+		                  </a>
+		                </li>
+		              </ul>
+		            </nav>
+		        </div>
+	        </div>
+	      </div>
+	    </div>
+	</div>
+
+{% endblock content %}

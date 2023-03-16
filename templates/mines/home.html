@@ -1,0 +1,235 @@
+{% extends "mines/base.html" %}
+{% load static humanize %}
+
+{% block stylesheets %}
+<script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script>
+
+<style type="text/css">
+  .overlay{
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    left: 0%;
+    top: 0%;
+    background: #171616b0;
+    z-index: 2000;
+    display: none;
+  }
+
+  .overlay.show{
+    display: block;
+    animation: fadeIn 1s forwards;
+  }
+
+  .overlay-inner{
+    max-width: 550px;
+    margin: auto;
+    padding-top: 3rem;
+  }
+
+  @keyframes fadeIn{
+    from{
+      display: block;
+      opacity: 0;
+    }
+    to{
+      opacity: 1;
+    }
+  }
+
+  .border-none{
+    border: none !important;
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+
+<div class="">
+	<div class="my-2">
+		<h2 class="text-muted"> Welcome Back {{ user.full_name }} </h2>
+	</div>
+
+
+
+	<div class="row my-3">
+    <div class="col-xl-4 col-lg-6">
+      <div class="card">
+        <!--
+          <div class="coinmarketcap-currency-widget" data-currencyid="1" data-base="USD" data-secondary="BTC" data-ticker="true" data-rank="false" data-marketcap="false" data-volume="false" data-statsticker="true" data-stats="USD"></div>
+        -->
+  
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+
+          <div class="tradingview-widget-copyright"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+          "symbol": "BITSTAMP:BTCUSD",
+          "width": "100%",
+          "height": "100%",
+          "locale": "en",
+          "dateRange": "12M",
+          "colorTheme": "light",
+          "trendLineColor": "rgba(73, 133, 231, 1)",
+          "underLineColor": "rgba(41, 98, 255, 0.3)",
+          "underLineBottomColor": "rgba(41, 98, 255, 0)",
+          "isTransparent": false,
+          "autosize": true,
+          "largeChartUrl": "",
+          "noTimeScale": true,
+          "chartOnly": false
+        }
+          </script>
+        </div>
+        <!-- TradingView Widget END -->
+      </div>
+    </div>
+
+    <div class="col-xl-8 col-lg-6">
+      <div class="card card-stats mb-4 mb-xl-0">
+        <div class="card-body">
+          <div class="row">
+            <div class="col mb-3">
+              <h5 class="card-title text-uppercase text-muted mb-2">Wallet Balance</h5>
+              <span class="h2 font-weight-bold mb-0"> ${{ user.userprofile.fiat_balance|default:"0.00"|intcomma }} </span>
+            </div>
+
+            <div class="col-auto">
+              <button class="btn btn-primary" id="cta-deposit"> Deposit </button>
+
+              <button class="btn btn-warning" id="cta-withdraw"> Withdraw </button>
+            </div>
+          </div>
+
+              
+
+          <p class="mt-3 mb-0 text-muted text-sm">
+          {% with user.userprofile.bitcoin_address as bit_addr%}
+            <span class="text-warning mr-2"><i class="fas fa-wallet"></i>  </span>
+            {% if bit_addr %}
+              <span class="text-nowrap font-weight-bold"> {{ bit_addr }} </span>
+            {% else %}
+              <button class="btn btn-sm btn-info" id="cta-wallet-setup"> Setup Wallet </button>
+            {% endif %}
+          {% endwith %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="my-4">
+    <div class="row">
+      
+      <div class="col-xl-6 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header">
+            <h3 class="mb-0 text-muted"> Recent Earnings </h3>
+          </div>
+          <div class="card-body p-2">
+            <ul class="list-group">
+              {% for transact in recent_earning %}
+                <li class="list-group-item">
+                  <div class="d-flex mb-1 justify-content-between align-items-center">
+                    <span class="text-primary font-weight-bold"> {{ transact.transaction_type|upper }} </span>
+                    <span class="text-dark font-weight-bold"> {{ transact.transaction_id|upper }} </span>
+                  </div>
+
+                  <div class="mt-1 d-flex justify-content-between align-items-center">
+                    <span class="text-dark font-weight-bold"> <i class="text-success fas fa-coins mr-2"></i> ${{ transact.amount|intcomma }} </span>
+                    <span class="text-dark font-weight-bold"> <i class="text-primary fas fa-calendar-alt mr-2"></i>{{ transact.date|naturalday|title }} </span>
+                  </div>
+                </li>
+              {% empty %}
+                <li class="list-group-item">
+                  <span> There's nothing to show here! </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="card-footer p-1">
+            <a href="{% url 'dashboard:earnings' %}" class="btn btn-info float-right shadow-none"> View all </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-6 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header">
+            <h3 class="mb-0 text-muted"> Recent Transactions </h3>
+          </div>
+          <div class="card-body p-2">
+            <ul class="list-group">
+              {% for transact in recent_transactions %}
+                <li class="list-group-item">
+                  <div class="d-flex mb-1 justify-content-between align-items-center">
+                    <span class="text-primary font-weight-bold"> {{ transact.transaction_type|upper }} </span>
+                    <span class="text-dark font-weight-bold"> {{ transact.transaction_id|upper }} </span>
+                    <span class="text-dark font-weight-bold"> <i class="text-primary fas fa-calendar-alt mr-2"></i>{{ transact.date|naturalday|title }} </span>
+                  </div>
+
+                  <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                    <span class="text-dark font-weight-bold"> <i class="text-success fas fa-coins mr-2"></i> ${{ transact.amount|intcomma }} </span>
+                    <span class="text-dark badge
+                      {% if transact.status|title == 'Confirmed' %}
+                        badge-success
+                      {% else %}
+                        badge-warning                        
+                      {% endif %}
+                     font-weight-bold"> {{ transact.status|title }}
+                    </span>
+                  </div>
+                </li>
+              {% empty %}
+                <li class="list-group-item">
+                  <span> There's nothing to show here! </span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="card-footer p-1">
+            <a href="{% url 'dashboard:history' %}" class="btn btn-info float-right shadow-none"> View all </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="pb-5 my-3">
+    <div id="bitcoin-news-widget">
+    <h3>Latest Bitcoin News</h3>
+    
+    <!-- <script src="https://cointelegraph.com/news-widget" data-ct-widget-limit="6" data-ct-widget-theme="light" data-ct-widget-size="large" data-ct-widget-images="true" data-ct-widget-language="en"></script>
+    -->
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+    </div>
+    <!-- TradingView Widget END -->
+
+  {% include "includes/forms.html" %}
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <script type="text/javascript"
+    src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
+      {
+      "feedMode": "symbol",
+      "symbol": "BITSTAMP:BTCUSD",
+      "colorTheme": "light",
+      "isTransparent": false,
+      "displayMode": "regular",
+      "width": "100%",
+      "height": "600",
+      "locale": "en"
+    }
+  </script>
+{% endblock javascripts %}

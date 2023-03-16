@@ -1,0 +1,163 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title> Bull Mines | {% block page_name %} {{ page_name }} {% endblock page_name %} </title>
+	<meta name="author" content="Bull Mines Ltd">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link rel="shortcut icon" href="https://i.ibb.co/K5YxKKM/logo.png" type="image/png" />
+	<link rel="apple-touch-icon" href="https://i.ibb.co/K5YxKKM/logo.png" type="image/png" />
+	<script src="{% static 'assets/vendor/jquery/dist/jquery.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/font-awesome/font-awesome.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/@fontawesome/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/vendor/bootstrap/dist/js/bootstrap.min.js' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'assets/css/site/home.css' %}">
+
+	{% block head_tags  %}
+		<meta name="description" content="">
+	{% endblock head_tags  %}
+
+
+</head>
+<body>
+
+	{# Navbar #}
+
+	<div>
+        <header id="iudy" class="header navbar-area">
+            <div id="ipn6" class="container-fluid">
+                <div id="ihrq" class="row align-items-center">
+                    <div id="ifl2" class="col-lg-12">
+                        <div id="iuvr" class="nav-inner">
+                            <nav id="i0mz" class="navbar navbar-expand-lg">
+                                <a href="/" class="navbar-brand">
+                                    <img src="{% static 'assets/bullmines-logo.svg' %}" alt="Logo"/>
+                                </a>
+                                <button type="button" id="navbar-toggler" class="navbar-toggler mobile-menu-btn">
+                                    <span class="toggler-icon"></span>
+                                    <span class="toggler-icon"></span>
+                                    <span class="toggler-icon"></span>
+                                </button>
+
+                                <div id="navbar" class="collapse navbar-collapse sub-menu-bar">
+                                    <ul id="nav" class="navbar-nav ms-auto">
+                                        <li id="ikrwf" class="nav-item">
+                                            <a href="{% url 'core:site-index' %}" aria-label="Toggle navigation" class="active">Home</a>
+                                        </li>
+                                        <li id="iqs8m" class="nav-item">
+                                            <a href="{% url 'core:site-index' %}#about-us" aria-label="Toggle navigation">About</a>
+                                        </li>
+
+                                        <li id="ipuxv" class="nav-item">
+                                            <a href="{% url 'core:site-index' %}#contact" aria-label="Toggle navigation">Contact</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="i1mqk" class="button">
+                                    <a href="{% url 'dashboard:register' %}" class="btn">Get started</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+	</div>
+
+
+	{% block content %}
+		
+	{% endblock content %}
+
+	<footer id="il96ri" class="footer section">
+        <div id="ilrojn" class="footer-top">
+            <div id="if7xbi" class="container">
+                <div id="i1ug8q" class="inner-content">
+                    <div id="i9pnjh" class="row">
+                        <div id="i9yn9a" class="col-lg-4 col-md-6 col-12">
+                            <div id="ikjwgg" class="single-footer f-about">
+                                <div id="ioqdpm" class="logo">
+                                    <a href="index.html">
+                                        <img src="{% static 'assets/bullmines-logo.svg' %}" alt="#"/>
+                                    </a>
+                                </div>
+                                <p>Making the world a better place through constructing elegant hierarchies.</p>
+                            </div>
+                        </div>
+                        <div id="ixnjqs" class="col-lg-2 col-md-6 col-12">
+                            <div id="i74h7k" class="single-footer f-link">
+                                <h3 id="i2racs">Useful Links</h3>
+                                <ul id="i23pmu">
+                                    <li id="i30xyr">
+                                        <a href="{% url 'core:site-index' %}" id="itmy3i">Home</a>
+                                    </li>
+                                    <li id="ilwdyz">
+                                        <a href="{% url 'core:site-index' %}#about-us" id="ixxrxa">Product</a>
+                                    </li>
+                                    <li id="iog0eg">
+                                        <a href="{% url 'core:site-index'%}#faqs" id="iuye1a">FAQs</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="i1tvtz" class="col-lg-2 col-md-6 col-12">
+                            <div id="isy6eg" class="single-footer f-link">
+                                <h3>Support</h3>
+                                <ul id="iv9n9f">
+                                    <li id="ifrj5o">
+                                        <a href="{% url 'core:site-page' 'privacy-policy' %}" id="ildhuz">Privacy Policy</a>
+                                    </li>
+                                    <li id="i248bi">
+                                        <a href="javascript:void(0)" id="indf7b">Terms of Use</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="ijy52l" class="col-lg-4 col-md-6 col-12">
+                            <div id="ifd05w" class="single-footer newsletter">
+                                <h3>Subscribe</h3>
+                                <p>Subscribe to our newsletter for the latest updates</p>
+                                <form action="#" method="get" target="_blank" id="ik05tq" class="newsletter-form">
+                                    <input name="EMAIL" placeholder="Email address" required="required" type="email" id="i101zf"/>
+                                    <div id="i6js4v" class="button">
+                                        <button id="igbzvp" class="sub-btn">
+                                            <i id="i13hy6" class="fas fa-envelope"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="iqfv8h" class="copyright-area">
+            <div id="iorsdo" class="container">
+                <div id="if2tuq" class="inner-content">
+                    <div id="i25suk" class="row">
+                        <div id="iak6og" class="col-lg-6 col-md-6 col-12">
+                            <p class="copyright-text">© 2023 Bull Mines - All Rights Reserved</p>
+                        </div>
+                        <div id="iejqbk" class="col-lg-6 col-md-6 col-12"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#top" id="ixpdhah" class="scroll-top">
+        <i id="i5fv5sn" class="fas fa-chevron-up"></i>
+    </a>
+
+    <script type="text/javascript">
+        document.querySelector('#navbar-toggler').addEventListener('click', function(event){
+            document.querySelector('#navbar').classList.toggle('collapse')
+        });
+    </script>
+</body>
+</html>

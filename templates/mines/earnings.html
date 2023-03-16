@@ -1,0 +1,181 @@
+{% extends "mines/base.html" %}
+{% load humanize %}
+
+{% block stylesheets %}
+
+<style type="text/css">
+	input[type="radio"] {
+	    height: 20px;
+	    width: 20px;
+	}
+</style>
+	
+{% endblock stylesheets %}
+
+
+{# developers@flutterwavego.com #}
+
+{% block content %}
+
+	<div class="overlay" id="invest-form">
+		  <!-- Deposit Form -->
+		  <div class="overlay-inner">
+		    <div class="rounded card">
+		      <div class="card-header">
+		        <h3 class="text-muted m-0"> Make an Investment </h3>
+		      </div>
+		      
+		      <div id="form-invest" class="card-body p-3">
+		        <form id="investment-form" method="post">
+		        	{% csrf_token %}
+
+		          <div class="form-inner">
+		            <!-- Step 1 -->
+		            <div id="form-step-one" class="">
+		              <div class="form-group">
+		                <label class="form-control-label" for="amount"> Investment Packages </label>
+		                <ul id="provider-select" class="list-group">
+		                  {% for pkg in packages %}
+		                  	<li class="list-group-item">
+			                  	<div class="d-flex justify-content-between align-items-center">
+				                  	<span class="d-flex justify-content-around align-items-center">
+				                  		<input type="radio" required name="package" value="{{pkg.id}}" />
+				                  		<span class="ml-3"> {{ pkg.name|title }} </span>
+				                  	</span>
+
+			                  		<span class="text-center">${{ pkg.capital|intcomma }} USD </span> 
+			                  		<span> {{ pkg.duration|title }} days </span>
+			                  		<span>${{ pkg.sample|intcomma }} USD </span> 
+			                  	</div>
+		                  	</li>
+		                  {% endfor %}
+		                </ul>
+		              </div>
+		            </div>
+		          </div>
+		        </form>
+		      </div>
+
+		      <div class="card-footer">
+		        <button class="btn btn-warning ml-3 float-right" id="cancelDeposit">
+		          Cancel
+		        </button>
+
+		        <button type="submit" form="investment-form" id="dform-success-one" class="btn btn-success float-right">
+		          Continue
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+	<div class="">
+
+		<div class="my-3">
+			<button class="btn btn-primary"> <i class="fas fa-plus mr-2"></i> New Investment</button>
+			<a href="{% url 'dashboard:packages' %}" class="btn btn-dark"> <i class="fas fa-eye mr-2"></i> View All Packages </a>
+		</div>
+
+		{#  Table Of History #}
+		<div class="row">
+	      <div class="col">
+	        <div class="card">
+	           <!-- Card header -->
+	            <div class="card-header border-0">
+	           		<h3 class="mb-0"> Your Earnings History </h3>
+	            </div>
+
+	            <!-- Light table -->
+	         	<div class="table-responsive">
+		            <table class="table align-items-center table-flush">
+		              <thead class="thead-light">
+		                <tr>
+		                  <th scope="col" class="sort"> <h4 class="mb-0"> Transaction Id </h4> </th>
+		                  <th scope="col" class="sort"> <h4 class="mb-0"> Amount </h4> </th>
+		                  <th scope="col" class="sort"> <h4 class="mb-0"> Status </h4> </th>
+		                  <th scope="col" class="sort"> <h4 class="mb-0"> Date </h4> </th>
+		                </tr>
+		              </thead>
+
+		              <tbody class="list">
+
+		              	{% for withdrawal in withdrawals %}
+		              		
+		                <tr>
+		                  <th scope="row">
+		                    <div class="media align-items-center">
+		                      <a href="#" class="avatar rounded-circle mr-3">
+		                        <img alt="Image placeholder" src="/static/assets/img/theme/react.jpg">
+		                      </a>
+		                      <div class="media-body">
+		                        <span class="name mb-0 text-sm"> {{ withdrawal.id }} </span>
+		                      </div>
+		                    </div>
+		                  </th>
+
+		                    <td class="budget">
+		                    	<span> $ {{ withdrawal.amount }} USD </span>
+		                    </td>
+		                  
+		                    <td>
+			                    <span class="badge badge-dot mr-4">
+			                      <i class="bg-info"></i>
+			                      <span class="status"> {{ withdrawal.approved }} </span>
+			                    </span>
+		                    </td>
+		                  
+
+		                    <td>
+			                    <div class="d-flex align-items-center">
+			                      <span class="completion mr-2"> {{ transaction.date }} </span>
+			                    </div>
+		                    </td>
+		                </tr>
+		              	{% empty %}
+		              		<tr>
+		              			<td>No data to show</td>
+		              			<td>None</td>
+		              			<td>None</td>
+		              			<td>None</td>
+		              		</tr>
+		              	{% endfor %}
+		              </tbody>
+		            </table>
+		        </div>
+
+	            <!-- Card footer -->
+		        <div class="card-footer py-4">
+		            <nav aria-label="...">
+
+		              <ul class="pagination justify-content-end mb-0">
+		              {% if page.has_previous %}		              	
+		                <li class="page-item disabled">
+		                  <a class="page-link" href="#" tabindex="-1">
+		                    <i class="fas fa-angle-left"></i>
+		                    <span class="sr-only">Previous</span>
+		                  </a>
+		                </li>
+		              {% endif %}
+
+		                <li class="page-item active">
+		                  <a class="page-link" href="#">{{ page.number }}</a>
+		                </li>
+
+		                {% if page.has_next %}
+		                <li class="page-item">
+		                  <a class="page-link" href="#">
+		                    <i class="fas fa-angle-right"></i>
+		                    <span class="sr-only">Next</span>
+		                  </a>
+		                </li>
+		                {% endif %}
+		              </ul>
+		            </nav>
+		        </div>
+	        </div>
+	      </div>
+	    </div>
+	</div>
+
+{% endblock content %}
+

@@ -1,0 +1,130 @@
+<p>To adapt the example code to use Django Channels, you'll need to create a consumers.py file in your Django app, define a BitcoinConsumer class that handles WebSocket connections, and modify the BitcoinListener class to send transactions to the BitcoinConsumer using Channels. Here's an example:</p>
+<p>Install the websocket-client and channels libraries:
+```sh
+pip install websocket-client channels</p>
+<p>```</p>
+<p>Create a new file called consumers.py in your Django app and add the following code:
+```py</p>
+<p>import json
+from channels.generic.websocket import WebsocketConsumer
+from .bitcoin_listener import BitcoinListener</p>
+<p>class BitcoinConsumer(WebsocketConsumer):
+    def connect(self):
+        self.wallet_address = self.scope["url_route"]["kwargs"]["wallet_address"]
+        self.accept()
+        self.listener = BitcoinListener(self.wallet_address, self.on_transaction)
+        self.listener.start()</p>
+<pre><code>def disconnect(self, close_code):
+    self.listener.stop()
+
+def on_transaction(self, tx_hash, amount):
+    self.send(json.dumps({
+        "type": "transaction",
+        "hash": tx_hash,
+        "amount": amount
+    }))
+</code></pre>
+<p>```</p>
+<p>This code defines a BitcoinConsumer class that handles WebSocket connections and uses a BitcoinListener to listen for transactions on a specific Bitcoin wallet address. When a transaction is detected, the on_transaction function sends the transaction information to the WebSocket client using Channels.</p>
+<p>Modify the BitcoinListener class in the bitcoin_listener.py file to use Channels:
+```py</p>
+<p>from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync</p>
+<p>class BitcoinListener:
+    def <strong>init</strong>(self, wallet_address, on_transaction):
+        self.wallet_address = wallet_address
+        self.on_transaction = on_transaction
+        self.ws = None</p>
+<pre><code>def start(self):
+    self.ws = websocket.WebSocketApp(
+        f"wss://ws.blockchain.info/inv",
+        on_message=self.on_message,
+        on_error=self.on_error,
+        on_close=self.on_close
+    )
+    self.ws.on_open = self.on_open
+    self.ws.run_forever()
+
+def on_open(self, ws):
+    subscribe_data = {
+        "op": "addr_sub",
+        "addr": self.wallet_address
+    }
+    ws.send(json.dumps(subscribe_data))
+
+def on_message(self, ws, message):
+    message = json.loads(message)
+    if message["op"] == "utx":
+        for tx in message["x"]["out"]:
+            if tx["addr"] == self.wallet_address:
+                tx_hash = tx["hash"]
+                amount = tx["value"]
+                self.send_transaction(tx_hash, amount)
+
+def on_error(self, ws, error):
+    print(error)
+
+def on_close(self, ws):
+    print("WebSocket closed")
+
+def send_transaction(self, tx_hash, amount):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        self.wallet_address,
+        {
+            "type": "transaction",
+            "hash": tx_hash,
+            "amount": amount
+        }
+    )
+</code></pre>
+<p>```</p>
+<p>In this modified BitcoinListener class, the send_transaction method uses Channels to send transactions to the BitcoinConsumer instead of directly sending them to the WebSocket client. The group_send method sends the transaction to all clients that are currently connected to the wallet_address group.</p>
+<p>In your Django app's routing.py file, add a WebSocket route that maps to the BitcoinConsumer:
+```py</p>
+<p>from django.urls import re_path
+from .consumers import BitcoinConsumer</p>
+<p>websocket_urlpatterns = [
+    re_path(r"ws/bitcoin/(?P<wallet_address>\w+)/", BitcoinConsumer.as_view())
+    ]</p>
+<p>```</p>
+<p>In your Django app's routing.py file, modify the urlpatterns list to include the WebSocket route:
+```py</p>
+<p>from django.urls import path, include
+from .views import home
+from . import websocket_routing</p>
+<p>urlpatterns = [
+    path('', home, name='home'),
+    path('websocket/', include(websocket_routing)),
+]</p>
+<p>```</p>
+<p>This code includes the WebSocket routes in your app's URL patterns.</p>
+<p>Modify your Django app's home.html template to connect to the WebSocket:
+```xml</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bitcoin Transactions</title>
+    <script>
+        var socket = new WebSocket("ws://" + window.location.host + "/websocket/bitcoin/{{ wallet_address }}/");
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            if (data.type === "transaction") {
+                var tx_hash = data.hash;
+                var amount = data.amount;
+                // Display the transaction information on the page
+                var transaction = "<p>Transaction " + tx_hash + " received: " + amount + " satoshis</p>";
+                document.getElementById("transactions").innerHTML += transaction;
+            }
+        };
+    </script>
+</head>
+<body>
+    <h1>Bitcoin Transactions</h1>
+    <div id="transactions"></div>
+</body>
+</html>
+
+<p>```</p>
+<p>This code connects to the WebSocket using the wallet_address from the URL and displays any transactions received on the page.</p>
+<p>Now you should be able to run your Django app and view Bitcoin transactions in real-time on the home page. When a user loads the page, the JavaScript code connects to the WebSocket and listens for transactions. When a transaction is received, the BitcoinConsumer class sends it to all clients that are connected to the wallet_address group using Channels, and the JavaScript code displays the transaction information on the page.</p>

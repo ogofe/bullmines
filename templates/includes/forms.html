@@ -1,0 +1,230 @@
+{% load static %}
+
+<div class="overlay" id="wallet-form">
+  <!-- Deposit Form -->
+  <div class="overlay-inner">
+    <div class="rounded card">
+      <div class="card-header">
+        <h3 class="text-muted m-0"> Setup your wallet </h3>
+      </div>
+      
+      <div class="card-body p-3">
+        <form method="post" id="setup-form" action="{% url 'dashboard:setup-wallet' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-control-label" for="provider"> Wallet Provider </label>
+            <select name="provider" id="provider" class="form-control">
+              <option selected disabled> Choose wallet provider </option>
+              <option> Blockchain </option>
+              <option> Bitcoin Mama </option>
+              <option> Coinbase </option>
+              <option> Crypto.com </option>
+              <option> Trust Wallet </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-control-label" for="address"> Bitcoin Wallet Address </label>
+            <input type="text" placeholder="Example: 3FZbgi29cpjq2GjdwV8eyHuJJnkLtktZc5" name="address" id="address" class="form-control">
+          </div>
+        </form>
+
+        <div class="mt-3">
+          <button class="btn btn-warning ml-3 float-right" id="cancelSetup">
+            Cancel
+          </button>
+
+          <button type="submit" form="setup-form" class="btn btn-success float-right">
+            Complete Setup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deposit-form">
+  <!-- Deposit Form -->
+  <div class="overlay-inner">
+    <div class="rounded card">
+      <div class="card-header">
+        <h3 class="text-muted m-0"> Fund your wallet </h3>
+      </div>
+      
+      <div id="form-deposit" class="card-body p-3">
+        <form id="dform" method="post" action="{% url 'dashboard:wallet' %}?transaction=deposit">
+          <div class="form-inner">
+            <!-- Step 1 -->
+            <div id="form-step-one" class="">
+              <div class="form-group mb-1">
+                <label class="form-control-label" for="amount"> Amount in USD <small> Minimum amount $100 </small></span> </label>
+                <input required class="form-control" type="number" id="amount" min="100" step="1" name="amount" value="100" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-control-label" for="amount"> Wallet Provider </label>
+                <select id="provider-select" required class="form-control" name="provider">
+                  <option selected disabled> Select a Provider </option>
+                  <option> Blockchain.com </option>
+                  <option> Trust Wallet </option>
+                  <option> Crypto.com </option>
+                  <option> Binance </option>
+                  <option> Bitcoin Mama </option>
+                  <option> ByBit </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="form-step-two" class="d-none">
+              <div>
+                <img class="w-100" height="300px" src="/static/assets/img/icons/wallet-code.svg">
+              </div>
+
+              <h3 class="text-center w-fit mx-auto mt-3 mb-3 p-2 rounded bg-secondary text-muted"> 1CyySQhW419SCZWZWUiYdiBV8AsWEoWLLp </h3>
+
+              <button type="button" id="cta-copy" class="btn d-block w-fit mx-auto mt-3 btn-danger shadow-none"> Copy Address </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-warning ml-3 float-right" id="cancelDeposit">
+          Cancel
+        </button>
+
+        <button type="submit" form="dform" id="dform-success-two" class="d-none btn btn-success float-right">
+          I've made this Deposit
+        </button>
+
+        <button disabled="true" id="dform-success-one" class="btn btn-success float-right">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="withdrawal-form">
+  <!-- Withdrawal Form -->
+  <div class="overlay-inner">
+    <div class="rounded card">
+      <div class="card-header">
+        <h3 class="text-muted m-0"> Request Withdrawal </h3>
+      </div>
+      
+      <div class="card-body p-3" id="form-withdraw">
+        <form id="wform" action="{% url 'dashboard:wallet' %}?trans=withdrawal">
+          {% csrf_token %}
+          <div class="form-group mb-1">
+            <label class="form-control-label" for="amount"> Amount in USD </label>
+            <input required class="form-control" type="number" id="amount" name="amount" />
+          </div>
+
+          <div>
+            <span><small> Maximum amount ${{ maxamount }} </small></span> <br>
+            <span><small> Withdrawal fee <span id="gas-fee"></span> </small></span>
+          </div>
+        </form>
+
+        <div class="mt-3">
+          <button class="btn btn-warning ml-3 float-right" id="cancelWithdraw">
+            Cancel
+          </button>
+
+          <button type="submit" form="wform" class="btn btn-primary float-right">
+            Submit Request
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  const ctaWalletSetup = document.querySelector('#cta-wallet-setup');
+  const ctaWithdraw = document.querySelector('#cta-withdraw');
+  const ctaDeposit = document.querySelector('#cta-deposit');
+  const withdrawForm = document.querySelector('#withdrawal-form');
+  const depositForm = document.querySelector('#deposit-form');
+  const walletForm = document.querySelector('#wallet-form');
+  const overlay = document.querySelector('#overlay');
+  const cancelWithdraw = document.querySelector('#cancelWithdraw');
+  const cancelDeposit = document.querySelector('#cancelDeposit');
+  const cancelSetup = document.querySelector('#cancelSetup');
+  const dForm = document.querySelector('#dform');
+  const copyBtn = document.querySelector('#cta-copy');
+  const dFormContinue = document.querySelector('#dform-success-one');
+  const dFormFinish = document.querySelector('#dform-success-two');
+
+  const provider = document.querySelector('#provider-select');
+
+  provider.addEventListener('change', function(event) {
+    dFormContinue.disabled = false
+  })
+
+  {% with user.userprofile.bitcoin_address as bit_addr %}
+  {% if bit_addr|escapejs %}
+  const walletIsSetup = true;
+  {% else %}
+  const walletIsSetup = false;
+  cancelSetup.addEventListener('click', function(event){
+    walletForm.classList.remove('show')
+  });
+  ctaWalletSetup.addEventListener('click', function(event){
+    walletForm.classList.add('show');
+  });
+  {% endif %}
+  {% endwith %}
+
+  cancelWithdraw.addEventListener('click', function(event){
+    withdrawForm.classList.remove('show')
+    window.location.reload()
+  });
+  cancelDeposit.addEventListener('click', function(event){
+    depositForm.classList.remove('show')
+    window.location.reload()
+  });
+
+
+  ctaWithdraw.addEventListener('click', function(event){
+    if(walletIsSetup){
+      withdrawForm.classList.add('show');
+    }else{
+      alert("You must setup your wallet to withdraw")
+    }
+  });
+
+  ctaDeposit.addEventListener('click', function(event){
+    if(walletIsSetup){
+      depositForm.classList.add('show');
+
+      dFormContinue.addEventListener('click', function(event){
+        let step1 = dForm.querySelector('#form-step-one');
+        let step2 = dForm.querySelector('#form-step-two');
+
+        step1.classList.add('d-none');
+        step2.classList.replace('d-none', 'fade-in');
+
+        dFormContinue.classList.add('d-none');
+        dFormFinish.classList.remove('d-none');
+      });
+
+    }else{
+      alert("You must setup your wallet to deposit")
+    }
+  });
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert("Copied!")
+  }
+
+  copyBtn.addEventListener('click', () => copyToClipboard('1CyySQhW419SCZWZWUiYdiBV8AsWEoWLLp'));
+
+
+
+
+</script>
